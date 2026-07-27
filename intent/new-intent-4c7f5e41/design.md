@@ -20,7 +20,8 @@
 - **Verified Salesforce connector**: Use dlt's official Salesforce connector (supports incremental load via SOQL cursors)
 - **Medallion architecture**: Bronze → Silver → Gold for data quality and analytics isolation
 - **Full historical sync**: Initial load captures all Salesforce history; incremental cursors on subsequent runs
-- **Schema contracts**: dlt `schema_contract: {tables: 'freeze'} ` on production resources to prevent breaking changes
+- **Schema contracts**: dlt schema_contract set to `evolve` during discovery, then promoted to `freeze` on production resources to prevent breaking changes
+- **Control columns**: Gold-layer facts include `_loaded_at` (pipeline run timestamp) and `_dbt_invocation_id` (dbt invocation identifier) for lineage and debugging
 
 ## Pipeline Inventory
 
@@ -28,13 +29,14 @@ Status of ingestion resources (one row per Salesforce object to be ingested). Ro
 
 | # | Resource | Status | Entry Point | Schema Contract: Tables | Schema Contract: Columns | Schema Contract: Data Type |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | opportunity | working | `Opportunity` | freeze | evolve | ignore |
-| 2 | account | working | `Account` | freeze | evolve | ignore |
-| 3 | contact | working | `Contact` | freeze | evolve | ignore |
-| 4 | user | working | `User` | freeze | evolve | ignore |
-| 5 | stage | working | `Stage` | freeze | evolve | ignore |
+| 1 | opportunity | working | `Opportunity` | evolve | evolve | ignore |
+| 2 | account | working | `Account` | evolve | evolve | ignore |
+| 3 | contact | working | `Contact` | evolve | evolve | ignore |
+| 4 | user | working | `User` | evolve | evolve | ignore |
+| 5 | stage | working | `Stage` | evolve | evolve | ignore |
+| 6 | lead | working | `Lead` | evolve | evolve | ignore |
 
-Note: Resource list and schema contracts will be finalized after source configuration and discovery (Build Plan step `03-salesforce-discovery`).
+Note: Resource list and exact schema contracts will be confirmed after source configuration and discovery (Build Plan step `03-salesforce-discovery`). Initial contracts set to `evolve` to permit discovery; production tables will apply `freeze` after schema is pinned.
 
 ## Model Inventory
 
@@ -67,9 +69,31 @@ Planned dbt models by medallion layer. Rows stay at `Status: working` until the 
 - `Stage` (pipeline stage definitions)
 - `Lead` (potential opportunities)
 
+## Change Impact
+
+**Transformation scope**: This is a fresh data product — no existing dbt models are being modified. All 7 planned models (`stg_*`, `int_*`, `fct_*`, `dim_*`) are new.
+
+**Downstream consumers**: None yet. This delivery establishes the analytics foundation; BI dashboards and reports will consume the gold-layer marts in a future iteration (explicitly out of scope per intent).
+
+**Impact rating**: No-impact — greenfield build, no breaking changes to existing models or consumers.
+
 ## Build Plan
 
 Ordered build steps — this is the durable plan; there is no `implementation-plan.md`. Status `working` until evidence is recorded.
+
+**Model Mapping** (all 7 models in Model Inventory map to generation steps):
+- Step `07-staging-models` generates: `stg_opportunity`, `stg_account`, `stg_user`
+- Step `08-intermediate-models` generates: `int_opportunity_account_join`
+- Step `09-gold-facts` generates: `fct_opportunity_monthly_account`, `dim_account`, `dim_user`
+
+**Open Questions Resolution Path**:
+- Specific Salesforce objects: step `03-salesforce-discovery` confirms available objects with dlt connector
+- Refresh frequency: decided during `01-salesforce-connection` setup; default to daily
+- Target grain: `fct_opportunity_monthly_account` at account-month grain; adjustable per feedback
+- KPIs and metrics: core opportunity/account/user analytics in steps `07`–`09`; semantic-model layer in future
+- Field customizations: flow through silver layer via schema_contract
+
+**Steps**:
 
 - `01-salesforce-connection` — phase: Build — goal: Configure Salesforce dlt source connection and test connectivity — skill: `add-or-update-source` — status: working — evidence: [pending]
 - `02-source-test-pass` — phase: Build — goal: Verify Salesforce source connection is live — skill: `test-source-connection` — status: working — evidence: [pending]
