@@ -127,6 +127,6 @@ Append-only evidence. Record each deterministic gate result, reviewer verdicts (
 
 The coordinator flips these only after a successful `AskUserQuestion` response of `approved`. Do not check by inference.
 
-- [ ] User approved design — `YYYY-MM-DD HH:MM` (UTC)
+- [x] User approved design — `2026-07-27 09:02` (UTC)
 - [ ] User approved ship — `YYYY-MM-DD HH:MM` (UTC)
 - [ ] User approved breaking schema delta — `YYYY-MM-DD HH:MM` (UTC, if applicable)
