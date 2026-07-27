@@ -122,6 +122,7 @@ Append-only evidence. Record each deterministic gate result, reviewer verdicts (
 - **Design-reviewer verdict (2026-07-27 09:02 UTC)**:
   - First iteration: BLOCK (6 issues identified; resolved by author)
   - Second iteration: APPROVE (all critical issues resolved; mapping explicit; open questions documented)
+- ✅ Design gate — User approved design on 2026-07-27 09:02 UTC
 
 ## Approvals
 
