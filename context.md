@@ -6,6 +6,10 @@ data products.
 
 ## Language
 
+**Salesforce Objects**: Key CRM entities including Opportunity, Account, Contact, User, and Stage. Critical for understanding the source data structure and dependencies when building ingestion pipelines.
+
+**Medallion Layers**: Architectural pattern organizing the data warehouse: Bronze (raw ingested data), Silver (cleaned and deduplicated), Gold (business-ready facts and dimensions). This domain uses this structure consistently.
+
 <!--
 Append one entry per term, as it surfaces (never pre-populate speculative terms):
 
