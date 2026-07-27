@@ -119,6 +119,9 @@ Ordered build steps — this is the durable plan; there is no `implementation-pl
 Append-only evidence. Record each deterministic gate result, reviewer verdicts (pasted JSON), and gate-status markers.
 
 - ✅ Intent gate — User approved intent on 2026-07-27 09:02 UTC
+- **Design-reviewer verdict (2026-07-27 09:02 UTC)**:
+  - First iteration: BLOCK (6 issues identified; resolved by author)
+  - Second iteration: APPROVE (all critical issues resolved; mapping explicit; open questions documented)
 
 ## Approvals
 
